@@ -4,7 +4,6 @@ import json
 import time
 import logging
 import requests
-import pprint
 
 from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_PREFIX, FLO_AUTH_URL )
 
@@ -58,9 +57,7 @@ class PyFlo(object):
 
         json_response = response.json()
 
-        LOG.info("Flo user %s authentication results %s : %s", self._username, FLO_AUTH_URL, json_response)
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(json_response)
+        LOG.debug("Flo user %s authentication results %s : %s", self._username, FLO_AUTH_URL, json_response)
         self._auth_token_expiry = time.time() + int( int(json_response['tokenExpiration']) / 2)
         self._auth_token = json_response['token']
         self._user_id = json_response['tokenPayload']['user']['user_id']
