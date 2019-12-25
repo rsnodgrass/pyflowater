@@ -6,7 +6,7 @@ import logging
 import requests
 import pprint
 
-from pyflowater.const import ( FLO_USER_AGENT, FLO_API_PREFIX, FLO_AUTH_URL )
+from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_PREFIX, FLO_AUTH_URL )
 
 LOG = logging.getLogger(__name__)
 
@@ -23,6 +23,8 @@ class PyFlo(object):
         :returns PyFlo base object
         """
         self._session = requests.Session()
+        self._headers = {}
+        self._params = {}
 
         self._auth_token = None
 
@@ -61,8 +63,8 @@ class PyFlo(object):
         pp.pprint(json_response)
         self._auth_token_expiry = time.time() + int( int(json_response['tokenExpiration']) / 2)
         self._auth_token = json_response['token']
-        self._user_id = json_response['tokenPayLoad']['user']['user_id']
-
+        self._user_id = json_response['tokenPayload']['user']['user_id']
+        
     def _is_access_token_expired(self):
         return time.time() > self._auth_token_expiry
 
@@ -76,9 +78,8 @@ class PyFlo(object):
         self._headers = {
             'User-Agent':    FLO_USER_AGENT,
             'Content-Type':  'application/json;charset=UTF-8',
-            'accept':        'application/json',
-            'Content-Type':  'application/json',
-            'Authorization':  self._auth_token
+            'Accept':        'application/json',
+            'authorization':  self._auth_token
         }
         self.__params = {}
 
@@ -102,12 +103,12 @@ class PyFlo(object):
         while loop <= retry:
 
             # override request.body or request.headers dictionary
-            params = self.__params
+            params = self._params
             if extra_params:
                 params.update(extra_params)
             LOG.debug("Params: %s", params)
 
-            headers = self.__headers
+            headers = self._headers
             if extra_headers:
                 headers.update(extra_headers)
             LOG.debug("Headers: %s", headers)
@@ -137,18 +138,18 @@ class PyFlo(object):
     def locations(self):
         """Return all locations registered with the Flo account."""
         # https://api-gw.meetflo.com/api/v2/users/<userId>?expand=locations
-        url = f"{FLO_API_PREFIX}/users/{self._user_id}?expand=locations"
+        url = f"{FLO_V2_API_PREFIX}/users/{self._user_id}?expand=locations"
         return self.query(url, method='GET')
 
     @property
     def devices(self, locationId):
         """Return all devices at a location"""
-        url = f"{FLO_API_PREFIX}/locations/{locationId}?expand=devices"
+        url = f"{FLO_V2_API_PREFIX}/locations/{locationId}?expand=devices"
         return self.query(url, method='GET')
 
     @property
     def run_health_test(self, deviceId):
-        url = f"{FLO_API_PREFIX}/devices/{deviceId}/healthTest/run"
+        url = f"{FLO_V2_API_PREFIX}/devices/{deviceId}/healthTest/run"
         return self.query(url, method='POST')
 
     @property
@@ -162,7 +163,7 @@ class PyFlo(object):
                    'page': 1,
                    'size': 100
         }
-        url = f"{FLO_API_PREFIX}/alerts"
+        url = f"{FLO_V2_API_PREFIX}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
     @property
@@ -173,5 +174,5 @@ class PyFlo(object):
                    'endDate': '2019-12-25T07:59:59.999Z',
                    'interval': '1h'
         }
-        url = f"{FLO_API_PREFIX}/water/consumption"
+        url = f"{FLO_V2_API_PREFIX}/water/consumption"
         return self.query(url, method='GET', extra_params=params)
