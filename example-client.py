@@ -4,6 +4,7 @@ import os
 import sys
 import pprint
 import logging
+import json
 
 from pyflowater import PyFlo
 
@@ -32,7 +33,16 @@ def main():
     flo = PyFlo(user, password)
 
     print('--Locations--')
-    pp.pprint(flo.locations)
+    locations = flo.locations
+#    pp.pprint(locations)
+
+    all_devices = []
+    for location in locations['locations']:
+        pp.pprint(location)
+        all_devices.append( location['devices'] )
+
+    print('--All Devices--')
+    pp.pprint(all_devices)
 
 if __name__ == "__main__":
     main()
