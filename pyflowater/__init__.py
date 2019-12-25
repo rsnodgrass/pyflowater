@@ -1,8 +1,10 @@
 """Base Python Class file for Flo"""
 
+import json
 import time
 import logging
 import requests
+import pprint
 
 from pyflowater.const import ( FLO_USER_AGENT, FLO_API_PREFIX, FLO_AUTH_URL )
 
@@ -20,7 +22,7 @@ class PyFlo(object):
         :param password: Flo user password
         :returns PyFlo base object
         """
-        self.__session = requests.Session()
+        self._session = requests.Session()
 
         self._auth_token = None
 
@@ -43,7 +45,7 @@ class PyFlo(object):
             'password': self._password
         })
         
-        LOG.debug("Authenticating Flo account %s via %s", self._username, FLO_AUTH_URL)
+        LOG.info("Authenticating Flo account %s via %s", self._username, FLO_AUTH_URL)
         response = requests.post(FLO_AUTH_URL, data=payload, headers=self._headers)
             # Example response:
             # { "token": "caJhb.....",
@@ -54,11 +56,13 @@ class PyFlo(object):
 
         json_response = response.json()
 
-        LOG.debug("Flo user %s authentication results %s : %s", self._username, auth_url, json_response)
-        self._auth_token_expiry = now + int( int(json_response['tokenExpiration']) / 2)
-        self._auth_token = json_response['token]'
+        LOG.info("Flo user %s authentication results %s : %s", self._username, FLO_AUTH_URL, json_response)
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(json_response)
+        self._auth_token_expiry = time.time() + int( int(json_response['tokenExpiration']) / 2)
+        self._auth_token = json_response['token']
         self._user_id = json_response['tokenPayLoad']['user']['user_id']
-y
+
     def _is_access_token_expired(self):
         return time.time() > self._auth_token_expiry
 
@@ -71,10 +75,10 @@ y
         """Reset the headers and params."""
         self._headers = {
             'User-Agent':    FLO_USER_AGENT,
-            'Content-Type':  'application/json;charset=UTF-8'
+            'Content-Type':  'application/json;charset=UTF-8',
             'accept':        'application/json',
             'Content-Type':  'application/json',
-            'Authorization':  self.__token
+            'Authorization':  self._auth_token
         }
         self.__params = {}
 
@@ -114,11 +118,11 @@ y
             # define connection method
             request = None
             if method == 'GET':
-                request = self.__session.get(url, headers=headers)
+                request = self._session.get(url, headers=headers)
             elif method == 'PUT':
-                request = self.__session.put(url, headers=headers, json=params)
+                request = self._session.put(url, headers=headers, json=params)
             elif method == 'POST':
-                request = self.__session.post(url, headers=headers, json=params)
+                request = self._session.post(url, headers=headers, json=params)
             else:
                 LOG.error("Invalid request method '%s'", method)
                 return None
@@ -165,7 +169,7 @@ y
     def consumption(self, locationId):
         """Return consumption for a location"""
         params = { 'locationId': locationId,
-                   'startDate': '2019-12-24T08:00:00.000Z'
+                   'startDate': '2019-12-24T08:00:00.000Z',
                    'endDate': '2019-12-25T07:59:59.999Z',
                    'interval': '1h'
         }

@@ -5,7 +5,7 @@ import sys
 import pprint
 import logging
 
-from pyflo import PyFlo
+from pyflowater import PyFlo
 
 def setup_logger():
     logger = logging.getLogger()
