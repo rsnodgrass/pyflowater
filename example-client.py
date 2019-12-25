@@ -34,15 +34,11 @@ def main():
 
     print('--Locations--')
     locations = flo.locations
-#    pp.pprint(locations)
+    pp.pprint(locations)
 
-    all_devices = []
+    print("\n--All Devices--")
     for location in locations['locations']:
-        pp.pprint(location)
-        all_devices.append( location['devices'] )
-
-    print('--All Devices--')
-    pp.pprint(all_devices)
+        pp.pprint( location['devices'] )
 
 if __name__ == "__main__":
     main()
