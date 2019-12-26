@@ -1,4 +1,4 @@
-## 0.0.2 (2019-12-25)
+## 0.0.3 (2019-12-25)
 
 * additional Flo V2 API support
 * now supports multiple locations
