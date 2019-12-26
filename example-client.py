@@ -46,5 +46,13 @@ def main():
     location_id = location_info['id']    
     pp.pprint( flo.location(location_id) )
 
+    print("\n--Consumption--")
+    for location in locations:
+        for device in location['devices']:
+            pp.pprint( device )
+            id = device['id']
+            print( id )
+            pp.pprint( flo.consumption(id) )
+
 if __name__ == "__main__":
     main()

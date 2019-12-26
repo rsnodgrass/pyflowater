@@ -20,6 +20,12 @@ V1 APIs
 - https://api.meetflo.com/api/v1/userdetails/me
 """
 
+FLO_HOME = 'home'
+FLO_AWAY = 'away'
+FLO_SLEEP = 'sleep'
+FLO_MODES = [ FLO_HOME, FLO_AWAY, FLO_SLEEP ]
+
+
 FLO_UNIT_SYSTEMS = {
     'imperial_us': { 
         'system':   'imperial_us',

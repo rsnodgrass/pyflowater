@@ -151,6 +151,7 @@ class PyFlo(object):
 
     def location(self, location_id, use_cached=True):
         """Return details on all devices at a location"""
+        # NOTE: since we always expand locations on the overall data, we could skip this call
         if not location_id in self._cached_locations or use_cached == False:
             url = f"{FLO_V2_API_PREFIX}/locations/{location_id}?expand=devices"
             data = self.query(url, method='GET')
@@ -164,16 +165,16 @@ class PyFlo(object):
         else:
             return None
 
-    def run_health_test(self, deviceId):
+    def run_health_test(self, device_id):
         """Run the health test for the specified Flo device"""
-        url = f"{FLO_V2_API_PREFIX}/devices/{deviceId}/healthTest/run"
+        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}/healthTest/run"
         return self.query(url, method='POST')
 
-    def alerts(self, locationId):
+    def alerts(self, location_id):
         """Return alerts for a location"""
 
         params = { 'isInternalAlarm': 'false',
-                   'locationId': locationId,
+                   'locationId': location_id,
                    'status': 'triggered',
                    'severity': 'warning',
                    'severity': 'critical',
@@ -183,7 +184,7 @@ class PyFlo(object):
         url = f"{FLO_V2_API_PREFIX}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
-    def consumption(self, locationId, startDate=None, endDate=NotImplemented, interval='1h'):
+    def consumption(self, location_id, startDate=None, endDate=None, interval='1h'):
         """Return consumption for a location"""
 
         if not startDate:
@@ -192,10 +193,11 @@ class PyFlo(object):
         if not endDate:
             startDate = '2019-12-25T07:59:59.999Z' # FIXME: calculate for end of startDate
 
-        params = { 'locationId': locationId,
+        params = { 'locationId': location_id,
                    'startDate': startDate,
                    'endDate': endDate,
                    'interval': interval
         }
         url = f"{FLO_V2_API_PREFIX}/water/consumption"
+        LOG.info(f"Loading {url}")
         return self.query(url, method='GET', extra_params=params)
