@@ -194,6 +194,14 @@ class PyFlo(object):
         valve = data['valve']
         return valve['lastKnown']
 
+    def turn_valve_on(self, device_id):
+        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        self.query(url, extra_params={ "valve": { "target": "open" }})
+
+    def turn_valve_off(self, device_id):
+        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        self.query(url, extra_params={ "valve": { "target": "closed" }})
+
     def set_preset_mode(self, device_id, mode):
         """Run the health test for the specified Flo device"""
         if not mode in FLO_MODES:
