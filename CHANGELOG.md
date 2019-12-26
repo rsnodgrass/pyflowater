@@ -1,3 +1,9 @@
+## 0.0.2 (2019-12-25)
+
+* additional Flo V2 API support
+* now supports multiple locations
+* example code expanded
+
 ## 0.0.1 (2019-12-24)
 
 * initial release of Python Flo API
