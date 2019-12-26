@@ -151,15 +151,18 @@ class PyFlo(object):
 
     def location(self, location_id, use_cached=True):
         """Return details on all devices at a location"""
-        if location_id in self._cached_locations or use_cached == False:
-            url = f"{FLO_V2_API_PREFIX}/locations/{locationId}?expand=devices"
+        if not location_id in self._cached_locations or use_cached == False:
+            url = f"{FLO_V2_API_PREFIX}/locations/{location_id}?expand=devices"
             data = self.query(url, method='GET')
             if not data:
                 LOG.warning(f"Failed to load data from {url}")
                 return None
             self._cached_locations[location_id] = data
         
-        return self._cached_locations[location_id]
+        if location_id in self._cached_locations:
+            return self._cached_locations[location_id]
+        else:
+            return None
 
     def run_health_test(self, deviceId):
         """Run the health test for the specified Flo device"""
