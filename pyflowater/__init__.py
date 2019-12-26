@@ -62,10 +62,8 @@ class PyFlo(object):
             self._auth_token = json_response['token']
             self._auth_token_expiry = time.time() + int( int(json_response['tokenExpiration']) / 2)
             self._user_id = json_response['tokenPayload']['user']['user_id']
-            return True
-
-        LOG.error(f"Failed authenticating Flo user {self._username}")
-        return False
+        else:
+            LOG.error(f"Failed authenticating Flo user {self._username}")
 
     @property
     def is_connected(self):
