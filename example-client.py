@@ -32,13 +32,19 @@ def main():
  
     flo = PyFlo(user, password)
 
-    print('--Locations--')
-    locations = flo.locations
-    pp.pprint(locations)
+    print(f"User = #{flo.user_id}")
 
-    print("\n--All Devices--")
-    for location in locations['locations']:
-        pp.pprint( location['devices'] )
+    print("\n--Data--")
+    pp.pprint( flo.data() )
+
+    print("\n--Locations--")
+    locations = flo.locations()
+    pp.pprint( locations )
+
+    print("\n--Single Location--")
+    location_info = locations[0]
+    location_id = location_info['id']    
+    pp.pprint( flo.location(location_id) )
 
 if __name__ == "__main__":
     main()

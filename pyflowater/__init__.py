@@ -149,9 +149,9 @@ class PyFlo(object):
         data = self.data(use_cached=use_cached)
         return data['locations']
 
-    def location(self, locationId, use_cached=True):
+    def location(self, location_id, use_cached=True):
         """Return details on all devices at a location"""
-        if location in self._cached_locations or use_cached == False:
+        if location_id in self._cached_locations or use_cached == False:
             url = f"{FLO_V2_API_PREFIX}/locations/{locationId}?expand=devices"
             data = self.query(url, method='GET')
             if not data:
