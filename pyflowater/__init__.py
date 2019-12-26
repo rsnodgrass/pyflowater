@@ -5,9 +5,13 @@ import time
 import logging
 import requests
 
-from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_PREFIX, FLO_AUTH_URL )
+from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_PREFIX, FLO_AUTH_URL, FLO_MODES )
 
 LOG = logging.getLogger(__name__)
+
+METHOD_GET = 'GET'
+METHOD_PUT = 'PUT'
+METHOD_POST = 'POST'
 
 class PyFlo(object):
     """Base object for SensorPush."""
@@ -82,7 +86,7 @@ class PyFlo(object):
         }
         self.__params = {}
 
-    def query(self, url, method='POST', extra_params=None, extra_headers=None, retry=3, force_login=True):
+    def query(self, url, method=METHOD_POST, extra_params=None, extra_headers=None, retry=3, force_login=True):
         """
         Returns a JSON object for an HTTP request (no caching included)
         :param url: API URL
@@ -117,11 +121,11 @@ class PyFlo(object):
 
             # define connection method
             request = None
-            if method == 'GET':
+            if method == METHOD_GET:
                 request = self._session.get(url, headers=headers)
-            elif method == 'PUT':
+            elif method == METHOD_PUT:
                 request = self._session.put(url, headers=headers, json=params)
-            elif method == 'POST':
+            elif method == METHOD_POST:
                 request = self._session.post(url, headers=headers, json=params)
             else:
                 LOG.error("Invalid request method '%s'", method)
@@ -154,7 +158,7 @@ class PyFlo(object):
         # NOTE: since we always expand locations on the overall data, we could skip this call
         if not location_id in self._cached_locations or use_cached == False:
             url = f"{FLO_V2_API_PREFIX}/locations/{location_id}?expand=devices"
-            data = self.query(url, method='GET')
+            data = self.query(url, method=METHOD_GET)
             if not data:
                 LOG.warning(f"Failed to load data from {url}")
                 return None
@@ -168,7 +172,36 @@ class PyFlo(object):
     def run_health_test(self, device_id):
         """Run the health test for the specified Flo device"""
         url = f"{FLO_V2_API_PREFIX}/devices/{device_id}/healthTest/run"
-        return self.query(url, method='POST')
+        return self.query(url, method=METHOD_POST)
+
+    def device(self, device_id):
+        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        data = self.query(url, method=METHOD_GET)
+        return data
+
+    def preset_mode(self, device_id):
+        data = self.device(device_id)
+        systemMode = data['systemMode']
+        return systemMode['target']
+
+    def telemetry(self, device_id):
+        data = self.device(device_id)
+        telemetry = data['telemetry']
+        return telemetry['current']
+
+    def valve_status(self, device_id):
+        data = self.device(device_id)
+        valve = data['valve']
+        return valve['lastKnown']
+
+    def set_preset_mode(self, device_id, mode):
+        """Run the health test for the specified Flo device"""
+        if not mode in FLO_MODES:
+            LOG.error(f"Invalid preset mode {mode} (must be {FLO_MODES})")
+            return
+
+        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        return self.query(url, method=METHOD_POST, extra_params={ "systemMode": { "target": mode }})
 
     def alerts(self, location_id):
         """Return alerts for a location"""
@@ -200,4 +233,4 @@ class PyFlo(object):
         }
         url = f"{FLO_V2_API_PREFIX}/water/consumption"
         LOG.info(f"Loading {url}")
-        return self.query(url, method='GET', extra_params=params)
+        return self.query(url, method=METHOD_GET, extra_params=params)
