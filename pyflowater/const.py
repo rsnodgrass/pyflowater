@@ -19,3 +19,24 @@ V1 APIs
 - https://api.meetflo.com/api/v1/users/me
 - https://api.meetflo.com/api/v1/userdetails/me
 """
+
+FLO_UNIT_SYSTEMS = {
+    'imperial_us': { 
+        'system':   'imperial_us',
+        'temp':     '°F',
+        'flow':     'gpm',
+        'pressure': 'psi',
+    },
+    'imperial_uk': { 
+        'system':   'imperial_uk',
+        'temp':     '°F',
+        'flow':     'gpm',
+        'pressure': 'psi',
+    },
+    'metric': { 
+        'system':   'metric',
+        'temp':     '°C',
+        'flow':     'lpm',
+        'pressure': 'kPa'
+    }
+}
