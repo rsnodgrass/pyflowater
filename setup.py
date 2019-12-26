@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(name='pyflowater',
-      version='0.0.3',
+      version='0.0.4',
       packages=[ 'pyflowater' ],
       description='Python interface for Flo by Moen API',
 #      long_description=long_description,
