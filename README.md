@@ -5,7 +5,10 @@
 
 Python library for communicating with the [Flo smart water monitoring and control devices](https://amzn.to/2WBn8tW?tag=rynoshark-20) via the Flo cloud API. [Flo](https://meetflo.com) is typically installed on the main water supply line and has sensors for flow rate, pressure, and temperature as well as shut off capabilities. Water shut off can be done manually, remotely, as well as automatically by Flo's emergency monitoring service when a leak is detected.
 
-This library is community supported, please submit changes and improvements.
+NOTE:
+
+* This library is community supported, please submit changes and improvements.
+* This is a very basic interface, not well thought out at this point, but works for the use cases that initially prompted spitting this out from.
 
 ## Installation
 
