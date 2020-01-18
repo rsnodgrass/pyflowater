@@ -1,3 +1,9 @@
+# pyflowater
+
+## 0.0.5 (2020-1-18)
+
+* updated to not store password in memory unless client explicity saves password
+
 ## 0.0.3 (2019-12-25)
 
 * additional Flo V2 API support
