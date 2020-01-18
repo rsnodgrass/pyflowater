@@ -14,7 +14,7 @@ METHOD_PUT = 'PUT'
 METHOD_POST = 'POST'
 
 class PyFlo(object):
-    """Base object for SensorPush."""
+    """Base object for Flo."""
 
     def __init__(self, username=None, password=None):
         """Create a PyFlo object.
@@ -29,21 +29,29 @@ class PyFlo(object):
 
         self._auth_token = None
         self._username = username
-        self._password = password
+
         self.login()
 
     def __repr__(self):
         """Object representation."""
         return "<{0}: {1}>".format(self.__class__.__name__, self._username)
-
+    
     def login(self):
+        if self._password:
+            self.login(password)
+
+    def save_password(self, password):
+        """Client can save password to enable automatic reauthentication"""
+        self._password = password
+
+    def login(self, password):
         """Login to the Flo account and generate access token"""
         self._reset_headers()
 
         # authenticate with user/password
         payload = json.dumps({
             'username': self._username,
-            'password': self._password
+            'password': password
         })
         
         LOG.debug(f"Authenticating Flo account {self._username} via {FLO_AUTH_URL}")
