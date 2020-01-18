@@ -30,7 +30,7 @@ class PyFlo(object):
         self._auth_token = None
         self._username = username
 
-        self.login()
+        self.login(password)
 
     def __repr__(self):
         """Object representation."""
