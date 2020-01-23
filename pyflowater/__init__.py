@@ -16,7 +16,7 @@ METHOD_POST = 'POST'
 class PyFlo(object):
     """Base object for Flo."""
 
-    def __init__(self, username=None, password=None):
+    def __init__(self, username, password=None):
         """Create a PyFlo object.
         :param username: Flo user email
         :param password: Flo user password
