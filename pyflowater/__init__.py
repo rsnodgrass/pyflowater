@@ -30,7 +30,7 @@ class PyFlo(object):
         self._auth_token = None
         self._username = username
 
-        self.login(password)
+        self.login_with_password(password)
 
     def __repr__(self):
         """Object representation."""
@@ -38,13 +38,13 @@ class PyFlo(object):
     
     def login(self):
         if self._password:
-            self.login(password)
+            self.login_with_password(password)
 
     def save_password(self, password):
         """Client can save password to enable automatic reauthentication"""
         self._password = password
 
-    def login(self, password):
+    def login_with_password(self, password):
         """Login to the Flo account and generate access token"""
         self._reset_headers()
 
@@ -104,7 +104,6 @@ class PyFlo(object):
         response = None
         self._reset_headers() # ensure the headers and params are reset to the bare minimum
 
-        # FIXME: this should really use refresh token, if possible, to reauthenticate
         if force_login and not self.is_connected:
             self.login()
 
