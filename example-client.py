@@ -47,15 +47,15 @@ def main():
     pp.pprint( flo.location(location_id) )
 
     for location in locations:
+        print(f"\n--Location {location['id']}--")
+        pp.pprint( flo.consumption(location['id']))
+
         for device in location['devices']:
             id = device['id']
         
-            print("\n--Device in Locations--")
+            print("\n--Devices--")
             pp.pprint( device )
-            
-            print("\n--Consumption--")
-            pp.pprint( flo.consumption(location['id']))
-
+    
             print("\n--Device Info--")
             pp.pprint( flo.device(id) )
 
