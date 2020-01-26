@@ -54,7 +54,7 @@ def main():
             pp.pprint( device )
             
             print("\n--Consumption--")
-            pp.pprint( flo.consumption(id) )
+            pp.pprint( flo.consumption(location['id']))
 
             print("\n--Device Info--")
             pp.pprint( flo.device(id) )

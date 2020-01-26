@@ -127,7 +127,7 @@ class PyFlo(object):
             # define connection method
             request = None
             if method == METHOD_GET:
-                request = self._session.get(url, headers=headers)
+                request = self._session.get(url, headers=headers, params=extra_params)
             elif method == METHOD_PUT:
                 request = self._session.put(url, headers=headers, json=params)
             elif method == METHOD_POST:
