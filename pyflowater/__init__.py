@@ -38,7 +38,7 @@ class PyFlo(object):
     
     def login(self):
         if self._password:
-            self.login_with_password(password)
+            self.login_with_password(self._password)
 
     def save_password(self, password):
         """Client can save password to enable automatic reauthentication"""
