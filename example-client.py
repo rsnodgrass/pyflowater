@@ -48,7 +48,6 @@ def main():
 
     for location in locations:
         print(f"\n--Location {location['id']}--")
-        pp.pprint( flo.consumption(location['id']))
 
         for device in location['devices']:
             id = device['id']
@@ -58,6 +57,11 @@ def main():
     
             print("\n--Device Info--")
             pp.pprint( flo.device(id) )
+
+            print("\n--Consumption--")
+            macAddress = device['macAddress']
+            pp.pprint( flo.consumption(location['id'], macAddress))
+
 
 if __name__ == "__main__":
     main()

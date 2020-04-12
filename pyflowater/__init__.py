@@ -230,19 +230,20 @@ class PyFlo(object):
         url = f"{FLO_V2_API_PREFIX}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
-    def consumption(self, location_id, startDate=None, endDate=None, interval='1h'):
+    def consumption(self, location_id, macAddress, startDate=None, endDate=None, interval='1h'):
         """Return consumption for a location"""
 
         if not startDate:
-            startDate = '2019-12-24T08:00:00.000Z' # FIXME: calculate for start of today
+            startDate = '2020-04-11T08:00:00.000Z' # FIXME: calculate for start of today (based on local timezone?)
 
         if not endDate:
-            startDate = '2019-12-25T07:59:59.999Z' # FIXME: calculate for end of startDate
+            startDate = '2020-04-12T07:59:59.999Z' # FIXME: calculate for end of startDate
 
         params = { 'locationId': location_id,
                    'startDate': startDate,
                    'endDate': endDate,
-                   'interval': interval
+                   'interval': interval,
+                   'macAddress': macAddress
         }
         url = f"{FLO_V2_API_PREFIX}/water/consumption"
         LOG.info(f"Loading {url}")
