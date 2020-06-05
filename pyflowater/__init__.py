@@ -133,11 +133,12 @@ class PyFlo(object):
             elif method == METHOD_POST:
                 request = self._session.post(url, headers=headers, json=params)
             else:
-                LOG.error("Invalid request method '%s'", method)
+                LOG.error("Invalid request method: %s", method)
                 return None
 
             if request and (request.status_code == 200):
                 response = request.json()
+                LOG.debug("Received from Flo: %s", response)
                 break # success!
 
         return response
