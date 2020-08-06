@@ -202,11 +202,11 @@ class PyFlo(object):
 
     def turn_valve_on(self, device_id):
         url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
-        self.query(url, extra_params={ "valve": { "target": "open" }})
+        self.query(url, extra_params={ "valve": { "target": "open" }}, method=METHOD_POST)
 
     def turn_valve_off(self, device_id):
         url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
-        self.query(url, extra_params={ "valve": { "target": "closed" }})
+        self.query(url, extra_params={ "valve": { "target": "closed" }}, method=METHOD_POST)
 
     def set_preset_mode(self, device_id, mode):
         """Run the health test for the specified Flo device"""
