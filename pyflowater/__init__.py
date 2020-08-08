@@ -125,22 +125,24 @@ class PyFlo(object):
             LOG.debug("Query: %s %s (attempt %s/%s)", method, url, loop, retry)
 
             # define connection method
-            request = None
+            response = None
             if method == METHOD_GET:
-                request = self._session.get(url, headers=headers, params=extra_params)
+                response = self._session.get(url, headers=headers, params=extra_params)
             elif method == METHOD_PUT:
-                request = self._session.put(url, headers=headers, json=params)
+                response = self._session.put(url, headers=headers, json=params)
             elif method == METHOD_POST:
-                request = self._session.post(url, headers=headers, json=params)
+                response = self._session.post(url, headers=headers, json=params)
             else:
-                LOG.error("Invalid request method: %s", method)
+                LOG.error(f"Invalid request method: {method}")
                 return None
 
-            if request and (request.status_code == 200):
-                response = request.json()
-                LOG.debug("Received from Flo: %s", response)
-                break # success!
+            if response and (response.status_code == 200):
+                json = response.json()
+                LOG.debug(f"Received from {method} {url}: %s", json)
+                return json
 
+        if response:
+            LOG.warning(f"Response code {response.status_code} from {method} {url}: %s", response)
         return response
 
     def clear_cache(self):
@@ -246,6 +248,6 @@ class PyFlo(object):
                    'interval': interval,
                    'macAddress': macAddress
         }
+
         url = f"{FLO_V2_API_PREFIX}/water/consumption"
-        LOG.info(f"Loading {url}")
         return self.query(url, method=METHOD_GET, extra_params=params)
