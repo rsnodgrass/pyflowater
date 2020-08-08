@@ -2,11 +2,11 @@
 
 FLO_USER_AGENT = 'PyFlo (pyflowater)'
 
-FLO_V1_API_PREFIX = 'https://api.meetflo.com/api/v1'
-FLO_V2_API_PREFIX = 'https://api-gw.meetflo.com/api/v2'
+FLO_V1_API_BASE = 'https://api.meetflo.com/api/v1'
+FLO_V2_API_BASE = 'https://api-gw.meetflo.com/api/v2'
 
-FLO_AUTH_URL       = FLO_V1_API_PREFIX + '/users/auth'
-FLO_USERTOKENS_URL = FLO_V1_API_PREFIX + '/usertokens/me'
+FLO_AUTH_URL       = FLO_V1_API_BASE + '/users/auth'
+FLO_USERTOKENS_URL = FLO_V1_API_BASE + '/usertokens/me'
 
 """
 V1 APIs

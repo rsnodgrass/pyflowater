@@ -5,7 +5,7 @@ import time
 import logging
 import requests
 
-from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_PREFIX, FLO_AUTH_URL, FLO_MODES )
+from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_BASE, FLO_AUTH_URL, FLO_MODES )
 
 LOG = logging.getLogger(__name__)
 
@@ -152,10 +152,17 @@ class PyFlo(object):
     def data(self, use_cached=True):
         if not self._cached_data or use_cached == False:
             # https://api-gw.meetflo.com/api/v2/users/<userId>?expand=locations
-            url = f"{FLO_V2_API_PREFIX}/users/{self._user_id}?expand=locations"
+            url = f"{FLO_V2_API_BASE}/users/{self._user_id}?expand=locations"
             self._cached_data = self.query(url, method='GET')
         return self._cached_data
 
+
+    def alarms(self, use_cached=False):
+        """Get all alarms for the Flo account"""
+        url = f"{FLO_V2_API_BASE}/alarms"
+        data = self.query(url, method=METHOD_GET)
+        return data.json()
+    
     def locations(self, use_cached=True):
         """Return all locations registered with the Flo account."""
         data = self.data(use_cached=use_cached)
@@ -165,7 +172,7 @@ class PyFlo(object):
         """Return details on all devices at a location"""
         # NOTE: since we always expand locations on the overall data, we could skip this call
         if not location_id in self._cached_locations or use_cached == False:
-            url = f"{FLO_V2_API_PREFIX}/locations/{location_id}?expand=devices"
+            url = f"{FLO_V2_API_BASE}/locations/{location_id}?expand=devices"
             data = self.query(url, method=METHOD_GET)
             if not data:
                 LOG.warning(f"Failed to load data from {url}")
@@ -179,11 +186,11 @@ class PyFlo(object):
 
     def run_health_test(self, device_id):
         """Run the health test for the specified Flo device"""
-        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}/healthTest/run"
+        url = f"{FLO_V2_API_BASE}/devices/{device_id}/healthTest/run"
         return self.query(url, method=METHOD_POST)
 
     def device(self, device_id):
-        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         data = self.query(url, method=METHOD_GET)
         return data
 
@@ -203,22 +210,39 @@ class PyFlo(object):
         return valve['lastKnown']
 
     def turn_valve_on(self, device_id):
-        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         self.query(url, extra_params={ "valve": { "target": "open" }}, method=METHOD_POST)
 
     def turn_valve_off(self, device_id):
-        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
+        url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         self.query(url, extra_params={ "valve": { "target": "closed" }}, method=METHOD_POST)
 
-    def set_preset_mode(self, device_id, mode):
-        """Run the health test for the specified Flo device"""
-        if not mode in FLO_MODES:
-            LOG.error(f"Invalid preset mode {mode} (must be {FLO_MODES})")
-            return
+    def set_location_mode(self, location_id: str, mode: str, additional_params=None):
+        url = f"{API_V2_BASE}/locations/{location_id}/systemMode"
 
-        url = f"{FLO_V2_API_PREFIX}/devices/{device_id}"
-        return self.query(url, method=METHOD_POST, extra_params={ "systemMode": { "target": mode }})
+        params = {"target": mode}
+        if additional_params:
+            params = {**params, **additional_params}
+        self.query(url, extra_params=params, method=METHOD_POST)
 
+    def set_mode_away(self, location_id: str):
+        self.set_location_mode(location_id, "away")
+
+    def set_mode_home(self, location_id: str):
+        self.set_location_mode(location_id, "home")
+
+    def set_mode_sleep(self, location_id, minutes=480, revert_mode="home"):
+        """
+        Set sleep mode for a location (default 8 hours)
+        :param minutes: Number of minutes to sleep (120=2 hours, 480=8 hours)
+        :param revert_mode: Mode to set after sleep concludes ("away" or "home")
+        """
+        self.set_location_mode(location_id, "sleep",
+                payload={
+                    "revertMinutes": minutes,
+                    "revertMode": revert_mode,
+                })
+              
     def alerts(self, location_id):
         """Return alerts for a location"""
 
@@ -230,7 +254,7 @@ class PyFlo(object):
                    'page': 1,
                    'size': 100
         }
-        url = f"{FLO_V2_API_PREFIX}/alerts"
+        url = f"{FLO_V2_API_BASE}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
     def consumption(self, location_id, macAddress, startDate=None, endDate=None, interval='1h'):
@@ -249,5 +273,5 @@ class PyFlo(object):
                    'macAddress': macAddress
         }
 
-        url = f"{FLO_V2_API_PREFIX}/water/consumption"
+        url = f"{FLO_V2_API_BASE}/water/consumption"
         return self.query(url, method=METHOD_GET, extra_params=params)
