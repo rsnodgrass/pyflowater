@@ -11,6 +11,17 @@ NOTE:
 * This library is community supported, please submit changes and improvements.
 * This is a very basic interface, not well thought out at this point, but works for the use cases that initially prompted spitting this out from.
 
+## Supports
+
+- current pressure
+- consumpation data
+- valve turn on/off
+- location modes (home, away, sleep)
+
+#### Not Supported
+
+- water temp (DEPRECATED by FLO)
+
 ## Installation
 
 ```
