@@ -122,7 +122,7 @@ class PyFlo(object):
             LOG.debug("Headers: %s", headers)
 
             loop += 1
-            LOG.debug("Querying %s on attempt: %s/%s", url, loop, retry)
+            LOG.debug("Query: %s %s (attempt %s/%s)", method, url, loop, retry)
 
             # define connection method
             request = None

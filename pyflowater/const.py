@@ -1,6 +1,6 @@
 """Constants used by PyFlo"""
 
-FLO_USER_AGENT = 'PyFlo (https://github.com/rsnodgrass/pyflowater/)'
+FLO_USER_AGENT = 'PyFlo (pyflowater)'
 
 FLO_V1_API_PREFIX = 'https://api.meetflo.com/api/v1'
 FLO_V2_API_PREFIX = 'https://api-gw.meetflo.com/api/v2'
