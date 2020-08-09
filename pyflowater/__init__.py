@@ -136,14 +136,14 @@ class PyFlo(object):
                 LOG.error(f"Invalid request method: {method}")
                 return None
 
-            if response and (response.status_code == 200):
-                json = response.json()
+            if response.status_code == 200:
+                json = response.json() 
                 LOG.debug(f"Received from {method} {url}: %s", json)
                 return json
+            else:
+                LOG.debug(f"Received from {method} {url} code {response.status_code}: %s", response)
 
-        if response:
-            LOG.warning(f"Response code {response.status_code} from {method} {url}: %s", response)
-        return response
+        return None
 
     def clear_cache(self):
         self._cached_data = None
