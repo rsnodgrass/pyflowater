@@ -25,6 +25,11 @@ FLO_AWAY = 'away'
 FLO_SLEEP = 'sleep'
 FLO_MODES = [ FLO_HOME, FLO_AWAY, FLO_SLEEP ]
 
+FLO_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.000Z'
+
+INTERVAL_MINUTE='1m'
+INTERVAL_HOURLY='1h'
+INTERVAL_DAILY='1d'
 
 FLO_UNIT_SYSTEMS = {
     'imperial_us': { 
