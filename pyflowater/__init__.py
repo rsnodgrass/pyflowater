@@ -14,6 +14,9 @@ METHOD_GET = 'GET'
 METHOD_PUT = 'PUT'
 METHOD_POST = 'POST'
 
+INTERVAL_HOURLY='1h'
+INTERVAL_DAILY='1d'
+
 class PyFlo(object):
     """Base object for Flo."""
 
@@ -248,7 +251,7 @@ class PyFlo(object):
         return self.query(url, method='GET', extra_params=params)
 
     # TODO: convert to startDate and endDate being datetime objects (time zone aware)
-    def consumption(self, location_id, macAddress, startDate=None, endDate=None, interval='1h'):
+    def consumption(self, location_id, macAddress, startDate=None, endDate=None, interval=INTERVAL_HOURLY):
         """Return consumption for a location"""
 
         # calculate since beginning of day in LOCAL timezone
