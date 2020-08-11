@@ -3,6 +3,7 @@
 import json
 import time
 import logging
+from datetime import timezone, datetime
 import requests
 
 from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_BASE, FLO_AUTH_URL, FLO_MODES )
@@ -246,21 +247,25 @@ class PyFlo(object):
         url = f"{FLO_V2_API_BASE}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
+    # TODO: convert to startDate and endDate being datetime objects (time zone aware)
     def consumption(self, location_id, macAddress, startDate=None, endDate=None, interval='1h'):
         """Return consumption for a location"""
 
+        # calculate since beginning of day in LOCAL timezone
+        now = datetime.now()
         if not startDate:
-            startDate = '2020-04-11T08:00:00.000Z' # FIXME: calculate for start of today (based on local timezone?)
+            startDate = now.replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=None).isoformat() + 'Z'
 
         if not endDate:
-            startDate = '2020-04-12T07:59:59.999Z' # FIXME: calculate for end of startDate
-
+            endDate = now.replace(tzinfo=None).isoformat() + 'Z'
+            
         params = { 'locationId': location_id,
-                   'startDate': startDate,
+                   'startDate': startDate, # Flo required format is 2020-04-11T08:00:00.000Z
                    'endDate': endDate,
                    'interval': interval,
                    'macAddress': macAddress
         }
-
+        LOG.warning(params)
+        
         url = f"{FLO_V2_API_BASE}/water/consumption"
         return self.query(url, method=METHOD_GET, extra_params=params)
