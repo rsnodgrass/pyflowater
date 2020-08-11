@@ -24,7 +24,6 @@ class PyFlo(object):
         """
         self._session = requests.Session()
         self._headers = {}
-        self._params = {}
         self.clear_cache()
 
         self._auth_token = None
@@ -109,20 +108,20 @@ class PyFlo(object):
 
         loop = 0
         while loop <= retry:
+            loop += 1
 
             # override request.body or request.headers dictionary
-            params = self._params
+            params = {}
             if extra_params:
                 params.update(extra_params)
-            LOG.debug("Params: %s", params)
 
             headers = self._headers
             if extra_headers:
                 headers.update(extra_headers)
-            LOG.debug("Headers: %s", headers)
 
-            loop += 1
             LOG.debug("Query: %s %s (attempt %s/%s)", method, url, loop, retry)
+            LOG.debug("... Params: %s", params)
+            LOG.debug("... Headers: %s", headers)
 
             # define connection method
             response = None
@@ -210,38 +209,28 @@ class PyFlo(object):
         return valve['lastKnown']
 
     def turn_valve_on(self, device_id):
+        LOG.debug(f"Turning valve on for device {device_id}")
         url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         self.query(url, extra_params={ "valve": { "target": "open" }}, method=METHOD_POST)
 
     def turn_valve_off(self, device_id):
+        LOG.debug(f"Turning valve on for device {device_id}")
         url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         self.query(url, extra_params={ "valve": { "target": "closed" }}, method=METHOD_POST)
 
-    def set_location_mode(self, location_id: str, mode: str, additional_params=None):
-        url = f"{API_V2_BASE}/locations/{location_id}/systemMode"
+    def set_mode(self, location_id: str, mode: str, additional_params={}):
+        url = f"{FLO_V2_API_BASE}/locations/{location_id}/systemMode"
 
         params = {"target": mode}
+        if mode == "sleep":
+            # Number of minutes to sleep (120=2 hours, 480=8 hours)
+            params["revertMinutes"] = 480
+            # Mode to set after sleep concludes ("away" or "home")
+            params["revertMode"] = 'home'
+
         if additional_params:
             params = {**params, **additional_params}
         self.query(url, extra_params=params, method=METHOD_POST)
-
-    def set_mode_away(self, location_id: str):
-        self.set_location_mode(location_id, "away")
-
-    def set_mode_home(self, location_id: str):
-        self.set_location_mode(location_id, "home")
-
-    def set_mode_sleep(self, location_id, minutes=480, revert_mode="home"):
-        """
-        Set sleep mode for a location (default 8 hours)
-        :param minutes: Number of minutes to sleep (120=2 hours, 480=8 hours)
-        :param revert_mode: Mode to set after sleep concludes ("away" or "home")
-        """
-        self.set_location_mode(location_id, "sleep",
-                payload={
-                    "revertMinutes": minutes,
-                    "revertMode": revert_mode,
-                })
               
     def alerts(self, location_id):
         """Return alerts for a location"""
