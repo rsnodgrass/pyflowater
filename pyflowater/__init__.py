@@ -6,7 +6,16 @@ import logging
 from datetime import timezone, datetime
 import requests
 
-from pyflowater.const import ( FLO_USER_AGENT, FLO_V2_API_BASE, FLO_AUTH_URL, FLO_MODES )
+from pyflowater.const import (
+    FLO_USER_AGENT,
+    FLO_V2_API_BASE,
+    FLO_AUTH_URL,
+    FLO_MODES,
+    FLO_TIME_FORMAT,
+    INTERVAL_MINUTE,
+    INTERVAL_HOURLY,
+    INTERVAL_DAILY
+)
 
 LOG = logging.getLogger(__name__)
 
@@ -14,9 +23,7 @@ METHOD_GET = 'GET'
 METHOD_PUT = 'PUT'
 METHOD_POST = 'POST'
 
-INTERVAL_MINUTE='1m'
-INTERVAL_HOURLY='1h'
-INTERVAL_DAILY='1d'
+DEVICE_ID_TO_LOCATION_MAC_TUPLE = {}
 
 class PyFlo(object):
     """Base object for Flo."""
@@ -213,13 +220,13 @@ class PyFlo(object):
         valve = data['valve']
         return valve['lastKnown']
 
-    def turn_valve_on(self, device_id):
-        LOG.debug(f"Turning valve on for device {device_id}")
+    def open_valve(self, device_id):
+        LOG.debug(f"Opening valve for device {device_id}")
         url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         self.query(url, extra_params={ "valve": { "target": "open" }}, method=METHOD_POST)
 
-    def turn_valve_off(self, device_id):
-        LOG.debug(f"Turning valve on for device {device_id}")
+    def close_valve(self, device_id):
+        LOG.debug(f"Closing valve for device {device_id}")
         url = f"{FLO_V2_API_BASE}/devices/{device_id}"
         self.query(url, extra_params={ "valve": { "target": "closed" }}, method=METHOD_POST)
 
@@ -251,25 +258,35 @@ class PyFlo(object):
         url = f"{FLO_V2_API_BASE}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
-    # TODO: convert to startDate and endDate being datetime objects (time zone aware)
-    def consumption(self, location_id, macAddress, startDate=None, endDate=None, interval=INTERVAL_HOURLY):
-        """Return consumption for a location"""
+    def consumption(self, device_id, startDate=None, endDate=None, interval=INTERVAL_HOURLY):
+        """Return consumption data for a given device id"""
+
+        location_id = None
+        mac_address = None
+
+        # find the location_id / macAddress for the device
+        for location in self.locations():
+            if not mac_address:
+                for device in location['devices']:
+                    if device['id'] == device_id:
+                        location_id = location['id']
+                        mac_address = device['macAddress']
+                        break
 
         # calculate since beginning of day in LOCAL timezone
         now = datetime.now()
         if not startDate:
-            startDate = now.replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=None).isoformat() + 'Z'
+            startDate = now.replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=None)
 
         if not endDate:
-            endDate = now.replace(tzinfo=None).isoformat() + 'Z'
-            
+            endDate = now.replace(tzinfo=None)
+
         params = { 'locationId': location_id,
-                   'startDate': startDate, # Flo required format is 2020-04-11T08:00:00.000Z
-                   'endDate': endDate,
-                   'interval': interval,
-                   'macAddress': macAddress
+                   'macAddress': mac_address,
+                   'startDate': startDate.strftime(FLO_TIME_FORMAT),
+                   'endDate': endDate.strftime(FLO_TIME_FORMAT),
+                   'interval': interval
         }
-        LOG.warning(params)
         
         url = f"{FLO_V2_API_BASE}/water/consumption"
         return self.query(url, method=METHOD_GET, extra_params=params)

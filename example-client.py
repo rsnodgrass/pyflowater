@@ -59,8 +59,7 @@ def main():
             pp.pprint( flo.device(id) )
 
             print("\n--Consumption--")
-            macAddress = device['macAddress']
-            pp.pprint( flo.consumption(location['id'], macAddress))
+            pp.pprint( flo.consumption(id))
 
 
 if __name__ == "__main__":
