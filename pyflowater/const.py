@@ -30,7 +30,7 @@ FLO_AWAY = 'away'
 FLO_SLEEP = 'sleep'
 FLO_MODES = [ FLO_HOME, FLO_AWAY, FLO_SLEEP ]
 
-FLO_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.000Z' # Flo required format is 2020-04-11T08:00:00.000Z
+FLO_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.000' # Flo required format is 2020-04-11T08:00:00.000Z
 
 INTERVAL_MINUTE='1m'
 INTERVAL_HOURLY='1h'

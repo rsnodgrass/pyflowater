@@ -276,16 +276,17 @@ class PyFlo(object):
         # calculate since beginning of day in LOCAL timezone
         now = datetime.now()
         if not startDate:
-            startDate = now.replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=None)
+            startDate = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
         if not endDate:
-            endDate = now.replace(tzinfo=None)
+            # Flo website queries for current data sets end timestamp as the last millisecond of the day, so do the same
+            endDate = now.replace(hour=23, minute=59, second=59, microsecond=999999)
 
         params = { 'locationId': location_id,
                    'macAddress': mac_address,
                    'startDate': startDate.strftime(FLO_TIME_FORMAT),
                    'endDate': endDate.strftime(FLO_TIME_FORMAT),
-                   'interval': interval
+                   'interval': interval,
         }
         
         url = f"{FLO_V2_API_BASE}/water/consumption"
