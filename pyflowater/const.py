@@ -8,7 +8,7 @@ FLO_V2_API_BASE = 'https://api-gw.meetflo.com/api/v2'
 FLO_AUTH_URL       = FLO_V1_API_BASE + '/users/auth'
 FLO_USERTOKENS_URL = FLO_V1_API_BASE + '/usertokens/me'
 
-FLO_PRESENCE_HEARTBEAT = FLO_V2_BASE + '/presence/me'
+FLO_PRESENCE_HEARTBEAT = FLO_V2_API_BASE + '/presence/me'
 
 # FIXME: for real time access to flow rates and
 #https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?database=projects%2Fflotechnologies-1b111%2Fdatabases%2F(default)&gsessionid={GSESSION_ID}&VER=8&RID=rpc&SID={SESSION_ID}&CI=0&AID=113&TYPE=xmlhttp&zx=lsvpgbg6aoar&t=2
