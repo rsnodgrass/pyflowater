@@ -40,6 +40,7 @@ class PyFlo(object):
 
         self._auth_token = None
         self._username = username
+        self._password = None # call save_password() if you want to save it
 
         self.login_with_password(password)
 
