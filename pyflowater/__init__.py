@@ -260,7 +260,8 @@ class PyFlo(object):
         return self.query(url, method='GET', extra_params=params)
 
     def consumption(self, device_id, startDate=None, endDate=None, interval=INTERVAL_HOURLY):
-        """Return consumption data for a given device id"""
+        """Return consumption data for a given device id. If startDate or endDate are naive
+        (tzinfo is None), they are assumed to represent local time of the running system."""
 
         location_id = None
         mac_address = None
@@ -283,10 +284,17 @@ class PyFlo(object):
             # Flo website queries for current data sets end timestamp as the last millisecond of the day, so do the same
             endDate = now.replace(hour=23, minute=59, second=59, microsecond=999999)
 
+        # in a python 3.6-or-later world we could use startDate_utc = startDate.astimezone(timezone.utc).
+        # note that fromtimestamp(timestamp()) only works for times supported by the system gmtime().
+        # see https://docs.python.org/3/library/datetime.html#datetime.datetime.fromtimestamp
+        startDate_utc = datetime.fromtimestamp(startDate.timestamp(), timezone.utc)
+        endDate_utc = datetime.fromtimestamp(endDate.timestamp(), timezone.utc)
+
+        # in python 3.6 and later, consider startDate.isoformat(timespec='milliseconds')
         params = { 'locationId': location_id,
                    'macAddress': mac_address,
-                   'startDate': startDate.strftime(FLO_TIME_FORMAT),
-                   'endDate': endDate.strftime(FLO_TIME_FORMAT),
+                   'startDate': startDate_utc.strftime(FLO_TIME_FORMAT) + 'Z',
+                   'endDate': endDate_utc.strftime(FLO_TIME_FORMAT) + 'Z',
                    'interval': interval,
         }
         
