@@ -6,6 +6,7 @@ import logging
 from datetime import timezone, datetime
 import requests
 
+from pyflowater.flostream import FloListener
 from pyflowater.const import (
     FLO_USER_AGENT,
     FLO_V2_API_BASE,
@@ -300,3 +301,11 @@ class PyFlo(object):
         
         url = f"{FLO_V2_API_BASE}/water/consumption"
         return self.query(url, method=METHOD_GET, extra_params=params)
+
+    def get_real_time_listener(self, mac_address, callback):
+        """Begin listening for the specified device (note MAC address, not ID), sending results to the specified callback.
+
+        Returned FloListener must be manually started."""
+        url = f"{FLO_V2_API_BASE}/session/firestore"
+        data = self.query(url, method=METHOD_POST)
+        return FloListener(data['token'], mac_address, callback)
