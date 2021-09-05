@@ -9,9 +9,7 @@ FLO_AUTH_URL       = FLO_V1_API_BASE + '/users/auth'
 FLO_USERTOKENS_URL = FLO_V1_API_BASE + '/usertokens/me'
 
 FLO_PRESENCE_HEARTBEAT = FLO_V2_API_BASE + '/presence/me'
-
-# FIXME: for real time access to flow rates and
-#https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?database=projects%2Fflotechnologies-1b111%2Fdatabases%2F(default)&gsessionid={GSESSION_ID}&VER=8&RID=rpc&SID={SESSION_ID}&CI=0&AID=113&TYPE=xmlhttp&zx=lsvpgbg6aoar&t=2
+FLO_HEARTBEAT_DELAY = 30.0
 
 """
 V1 APIs
@@ -31,6 +29,10 @@ FLO_SLEEP = 'sleep'
 FLO_MODES = [ FLO_HOME, FLO_AWAY, FLO_SLEEP ]
 
 FLO_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.000' # Flo required format is 2020-04-11T08:00:00.000Z
+
+FIREBASE_REST_API = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty'
+FLO_GOOGLE_API_KEY = 'AIzaSyBBquh94zXF15FORbe2lJC9J8kerqsVo9Y'
+FLO_FIRESTORE_PROJECT = 'flotechnologies-1b111'
 
 INTERVAL_HOURLY='1h'
 INTERVAL_DAILY='1d'
