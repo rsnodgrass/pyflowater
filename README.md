@@ -48,7 +48,7 @@ See also [example-client.py](example-client.py) for a working example.
 ### Integrations
 
 * [Flo for Home Assistant](https://www.home-assistant.io/integrations/flo/)
-* [Flo to InfluxDb](https://github.com/rickshinners/flo-to-influxdb)
+* [Flo to InfluxDB](https://github.com/rickshinners/flo-to-influxdb)
 * [Flo to Prometheus](https://github.com/dulitz/porter)
 
 ## Known Issues
