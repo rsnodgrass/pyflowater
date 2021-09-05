@@ -13,9 +13,9 @@ from pyflowater.const import (
     FLO_AUTH_URL,
     FLO_MODES,
     FLO_TIME_FORMAT,
-    INTERVAL_MINUTE,
     INTERVAL_HOURLY,
-    INTERVAL_DAILY
+    INTERVAL_DAILY,
+    INTERVAL_MONTHLY
 )
 
 LOG = logging.getLogger(__name__)

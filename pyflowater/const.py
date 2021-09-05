@@ -33,9 +33,9 @@ FIREBASE_REST_API = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty'
 FLO_GOOGLE_API_KEY = 'AIzaSyBBquh94zXF15FORbe2lJC9J8kerqsVo9Y'
 FLO_FIRESTORE_PROJECT = 'flotechnologies-1b111'
 
-INTERVAL_MINUTE='1m'
 INTERVAL_HOURLY='1h'
 INTERVAL_DAILY='1d'
+INTERVAL_MONTHLY='1m'
 
 FLO_UNIT_SYSTEMS = {
     'imperial_us': { 
