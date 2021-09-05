@@ -13,6 +13,11 @@ from pyflowater.const import (
     FLO_AUTH_URL,
     FLO_MODES,
     FLO_TIME_FORMAT,
+<<<<<<< HEAD
+=======
+    FLO_PRESENCE_HEARTBEAT,
+    INTERVAL_MINUTE,
+>>>>>>> Update comments, fix heartbeat
     INTERVAL_HOURLY,
     INTERVAL_DAILY,
     INTERVAL_MONTHLY
@@ -305,7 +310,14 @@ class PyFlo(object):
     def get_real_time_listener(self, mac_address, callback):
         """Begin listening for the specified device (note MAC address, not ID), sending results to the specified callback.
 
-        Returned FloListener must be manually started."""
+        Callback is a function that accepts a single argument containing the dictionary returned by the Flo service, of the form:
+
+
+
+        Returneds a FloListener. You must call start() on the returned instance to begin receiving callbacks."""
         url = f"{FLO_V2_API_BASE}/session/firestore"
         data = self.query(url, method=METHOD_POST)
-        return FloListener(data['token'], mac_address, callback)
+        return FloListener(self._do_heartbeat, data['token'], mac_address, callback)
+
+    def _do_heartbeat(self):
+        self.query(FLO_PRESENCE_HEARTBEAT, method=METHOD_POST)
