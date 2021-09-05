@@ -45,6 +45,12 @@ See also [example-client.py](example-client.py) for a working example.
 * *[Special Flo Deal: Purchase Flo and get two free Smart Water Detectors](http://fbuy.me/v/rsnodgrass)*
 * [Flo on Amazon](https://amzn.to/2WBn8tW?tag=rynoshark-20)
 
+### Integrations
+
+* [Flo for Home Assistant](https://www.home-assistant.io/integrations/flo/)
+* [Flo to InfluxDb](https://github.com/rickshinners/flo-to-influxdb)
+* [Flo to Prometheus](https://github.com/dulitz/porter)
+
 ## Known Issues
 
 * not all APIs supported
