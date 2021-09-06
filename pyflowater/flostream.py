@@ -20,6 +20,7 @@ def _get_token_info(token):
     resp = requests.post(url, headers=headers, data=data)
     return resp.json()
 
+
 class FloListener:
     """Flo firestore listener class."""
 
@@ -50,8 +51,11 @@ class FloListener:
         if not self._doc_ref:
             self._doc_ref = self._client.collection('devices').document(self._deviceId)
         self._watch = self._doc_ref.on_snapshot(self._handle)
-        self._heartbeat = threading.Timer(FLO_HEARTBEAT_DELAY, self._do_heartbeat)
-        self._heartbeat.start()
+        if self.heartbeat_func:
+            self._heartbeat = threading.Timer(FLO_HEARTBEAT_DELAY, self._do_heartbeat)
+            self._heartbeat.start()
+        else:
+            self._heartbeat = None
 
     def stop(self):
         """Shut down the listener, if started."""
@@ -59,8 +63,9 @@ class FloListener:
             return
         self._watch.close()
         self._watch = None
-        self._heartbeat.cancel()
-        self._heartbeat = None
+        if self._heartbeat:
+            self._heartbeat.cancel()
+            self._heartbeat = None
 
     def _handle(self, document, changes, timestamp):
         self._callback(document[0].to_dict())
