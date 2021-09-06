@@ -27,7 +27,12 @@ METHOD_POST = 'POST'
 
 DEVICE_ID_TO_LOCATION_MAC_TUPLE = {}
 
-class PyFlo(object):
+
+class FloError(Exception):
+    pass
+
+
+class PyFlo:
     """Base object for Flo."""
 
     def __init__(self, username, password=None):
@@ -261,21 +266,19 @@ class PyFlo(object):
         url = f"{FLO_V2_API_BASE}/alerts"
         return self.query(url, method='GET', extra_params=params)
 
+    def _get_locid_mac(self, device_id):
+        """Find the location_id and MAC address for device_id"""
+        for location in self.locations():
+            for device in location['devices']:
+                if device['id'] == device_id:
+                    return (location['id'], device['macAddress'])
+        raise FloError(f'no device with id {device_id}')
+
     def consumption(self, device_id, startDate=None, endDate=None, interval=INTERVAL_HOURLY):
         """Return consumption data for a given device id. If startDate or endDate are naive
         (tzinfo is None), they are assumed to represent local time of the running system."""
 
-        location_id = None
-        mac_address = None
-
-        # find the location_id / macAddress for the device
-        for location in self.locations():
-            if not mac_address:
-                for device in location['devices']:
-                    if device['id'] == device_id:
-                        location_id = location['id']
-                        mac_address = device['macAddress']
-                        break
+        (location_id, mac_address) = self._get_locid_mac(device_id)
 
         # calculate since beginning of day in LOCAL timezone
         now = datetime.now()
@@ -303,17 +306,36 @@ class PyFlo(object):
         url = f"{FLO_V2_API_BASE}/water/consumption"
         return self.query(url, method=METHOD_GET, extra_params=params)
 
-    def get_real_time_listener(self, mac_address, callback):
-        """Begin listening for the specified device (note MAC address, not ID), sending results to the specified callback.
+    def get_real_time_listener(self, device_id, callback, heartbeat=True):
+        """Begin listening for the specified device, sending results to the specified callback.
 
         Callback is a function that accepts a single argument containing the dictionary returned by the Flo service, of the form:
 
+  {
+    "valve": { "lastKnown": "open" },
+    "systemMode": { "lastKnown": "home" },
+    "telemetry": { "current": { "psi": 51.1, "updated": "2021-09-04T23:07:03Z", "gpm": 0.0, "tempF": 68.4 } },
+    ...
+  }
 
+        If heartbeat is True (the default), we spawn a thread to tell the device
+        to stream telemetry into firestore. If heartbeat is False, we don't.
+        Streaming telemetry (especially in the inefficient way Flo does it) is
+        costly, so please don't do this willy-nilly or they will shut us off.
 
-        Returneds a FloListener. You must call start() on the returned instance to begin receiving callbacks."""
+        Returns a FloListener. You must call start() on the returned
+        instance to begin receiving callbacks.
+
+        """
+        # we issue one heartbeat initially even if we won't issue any later,
+        # since presumably we want one callback with the current data.
+        self._do_heartbeat()
         url = f"{FLO_V2_API_BASE}/session/firestore"
         data = self.query(url, method=METHOD_POST)
-        return FloListener(self._do_heartbeat, data['token'], mac_address, callback)
+        (location_id, mac_address) = self._get_locid_mac(device_id)
+        return FloListener(
+            heartbeat and self._do_heartbeat, data['token'], mac_address, callback
+        )
 
     def _do_heartbeat(self):
         self.query(FLO_PRESENCE_HEARTBEAT, method=METHOD_POST)
