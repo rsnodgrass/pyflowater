@@ -51,7 +51,7 @@ class FloListener:
         if not self._doc_ref:
             self._doc_ref = self._client.collection('devices').document(self._deviceId)
         self._watch = self._doc_ref.on_snapshot(self._handle)
-        if self.heartbeat_func:
+        if self._heartbeat_func:
             self._heartbeat = threading.Timer(FLO_HEARTBEAT_DELAY, self._do_heartbeat)
             self._heartbeat.start()
         else:
