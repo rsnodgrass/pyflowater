@@ -9,7 +9,7 @@ FLO_AUTH_URL       = FLO_V1_API_BASE + '/users/auth'
 FLO_USERTOKENS_URL = FLO_V1_API_BASE + '/usertokens/me'
 
 FLO_PRESENCE_HEARTBEAT = FLO_V2_API_BASE + '/presence/me'
-FLO_HEARTBEAT_DELAY = 30.0
+FLO_HEARTBEAT_DELAY = 60.0  # their timeout appears to be 2 minutes, so half that
 
 """
 V1 APIs
