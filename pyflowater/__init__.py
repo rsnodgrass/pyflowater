@@ -332,6 +332,15 @@ class PyFlo:
         self._do_heartbeat()
         url = f"{FLO_V2_API_BASE}/session/firestore"
         data = self.query(url, method=METHOD_POST)
+        if data == None:
+            for i in range(3):
+                time.sleep(0.1)
+                data = self.query(url, method=METHOD_POST)
+                if data != None:
+                    break
+            if data == None:
+                LOG.warning(f"Failed to load data from {url}")
+                return None
         (location_id, mac_address) = self._get_locid_mac(device_id)
         return FloListener(
             heartbeat and self._do_heartbeat, data['token'], mac_address, callback
