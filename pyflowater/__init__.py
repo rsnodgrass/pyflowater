@@ -5,6 +5,7 @@ import time
 import logging
 from datetime import timezone, datetime
 import requests
+from retry import retry
 
 from pyflowater.flostream import FloListener
 from pyflowater.const import (
@@ -29,6 +30,9 @@ DEVICE_ID_TO_LOCATION_MAC_TUPLE = {}
 
 
 class FloError(Exception):
+    pass
+
+class DataNotObtained(Exception):
     pass
 
 
@@ -331,16 +335,16 @@ class PyFlo:
         # since presumably we want one callback with the current data.
         self._do_heartbeat()
         url = f"{FLO_V2_API_BASE}/session/firestore"
-        data = self.query(url, method=METHOD_POST)
-        if data == None:
-            for i in range(3):
-                time.sleep(0.1)
-                data = self.query(url, method=METHOD_POST)
-                if data != None:
-                    break
+        @retry(DataNotObtained,tries=3,delay=.1)
+        def getdata(url):
+            try:
+                data = self.query(url, method=METHOD_POST)      
+            except Exception as e:
+                raise DataNotObtained(f"Failed to load data from {url}: {e}")
             if data == None:
-                LOG.warning(f"Failed to load data from {url}")
-                return None
+                raise DataNotObtained(f"Failed to load data from {url}: No Data")
+            return(data)
+        data = getdata(url)
         (location_id, mac_address) = self._get_locid_mac(device_id)
         return FloListener(
             heartbeat and self._do_heartbeat, data['token'], mac_address, callback
