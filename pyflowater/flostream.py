@@ -1,17 +1,19 @@
 """Code relating to the firestore API Flo use to stream live data."""
 
-import requests
 import json
 import threading
+
+import requests
 from google.cloud import firestore
 from google.oauth2.credentials import Credentials
 
 from pyflowater.const import (
-    FLO_GOOGLE_API_KEY,
     FIREBASE_REST_API,
     FLO_FIRESTORE_PROJECT,
+    FLO_GOOGLE_API_KEY,
     FLO_HEARTBEAT_DELAY,
 )
+
 
 def _get_token_info(token):
     url = f"{FIREBASE_REST_API}/verifyCustomToken?key={FLO_GOOGLE_API_KEY}"
@@ -46,10 +48,12 @@ class FloListener:
             return
         if not self._client:
             tinfo = _get_token_info(self._token)
-            creds = Credentials(tinfo['idToken'], refresh_token=tinfo['refreshToken'])
-            self._client = firestore.Client(project=FLO_FIRESTORE_PROJECT, credentials=creds)
+            creds = Credentials(tinfo["idToken"], refresh_token=tinfo["refreshToken"])
+            self._client = firestore.Client(
+                project=FLO_FIRESTORE_PROJECT, credentials=creds
+            )
         if not self._doc_ref:
-            self._doc_ref = self._client.collection('devices').document(self._deviceId)
+            self._doc_ref = self._client.collection("devices").document(self._deviceId)
         self._watch = self._doc_ref.on_snapshot(self._handle)
         if self._heartbeat_func:
             self._heartbeat = threading.Timer(FLO_HEARTBEAT_DELAY, self._do_heartbeat)
